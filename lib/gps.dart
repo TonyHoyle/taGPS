@@ -67,13 +67,13 @@ class GpsData {
     //
     // At low speeds <1m/s this is probably wrong due to jitter in the GPS signal.
     // Possibly calculate second only if speed is faster
-    final ns = sin(lon1 - lon2);
-    final ew = cos(lat1) * tan(lat2) -  sin(lat1) * cos(lon1 - lon2);
+    final ns = sin(lon2 - lon1) * cos(lat2);
+    final ew = cos(lat1) * sin(lat2) -  sin(lat1) * cos(lat2) * cos(lon1 - lon2);
     calculatedBearing = _radToDeg(atan2(ns, ew));
 
     // Straight line distance
     // There are about a dozen variants of this, all produce slightly
-    // different results, some don't even work...
+    // different results, some don't even work... this one seems pretty accurate
     const earthRadius = 6378137.0;
     final dLat = sin(lat2 - lat1) / 2;
     final dLon = sin(lon2 - lon1) / 2;

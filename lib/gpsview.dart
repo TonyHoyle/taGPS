@@ -15,26 +15,63 @@ class GpsView extends StatefulWidget {
   State<GpsView> createState() => _GpsViewState();
 }
 
-class _GpsViewState extends State<GpsView> {
+class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
+  // ignore: constant_identifier_names
+  static const Mph = 2.23694;
+//  static const Kph = 3.6;
+
   Timer? _timer;
+  final _speedConstant = Mph;
+  final _speedSuffix = 'mph';
 
   @override
   void initState() {
     super.initState();
-    Wakelock.enable();
-    Future.delayed(const Duration(seconds: 1), () async {
+
+    WidgetsBinding.instance.addObserver(this);
+    Future.delayed(Duration.zero, () async {
       await widget.gpsData.init();
-      _timer = Timer.periodic(const Duration(milliseconds: 250), (t) async {
-        setState(() {});
-      });
+      start();
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    stop();
+
+    super.dispose();
+  }
+
+  void start()
+  {
+    Wakelock.enable();
+    _timer = Timer.periodic(const Duration(milliseconds: 250), (t) {
+      setState(() {});
+    });
+  }
+
+  void stop()
+  {
     _timer?.cancel();
     Wakelock.disable();
-    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // These are the callbacks
+    switch (state) {
+      case AppLifecycleState.resumed:
+        start();
+        break;
+      case AppLifecycleState.paused:
+        stop();
+        break;
+      default:
+        break;
+    }
   }
 
   @override
@@ -52,7 +89,7 @@ class _GpsViewState extends State<GpsView> {
                     style: const TextStyle(fontSize: 28)),
                 const Spacer(),
                 const Text('Speed (actual)'),
-                Text("${NumberFormat("###0").format(widget.gpsData.speed * 2.23694)}mph",
+                Text("${NumberFormat("###0").format(widget.gpsData.speed * _speedConstant)}$_speedSuffix",
                     style: const TextStyle(fontSize: 28)),
                 const Spacer(),
                 const Text('Bearing (actual)'),
@@ -68,7 +105,7 @@ class _GpsViewState extends State<GpsView> {
                 const Spacer(),
                 const Text('Speed (calculated))'),
                 Text(
-                    "${NumberFormat("###0").format(widget.gpsData.calculatedSpeed * 2.23694)}mph",
+                    "${NumberFormat("###0").format(widget.gpsData.calculatedSpeed * _speedConstant)}$_speedSuffix",
                     style: const TextStyle(fontSize: 28)),
                 const Spacer(),
                 const Text('Bearing (calculated)'),

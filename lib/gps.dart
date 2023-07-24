@@ -1,6 +1,7 @@
 
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 
 class GpsData {
@@ -19,7 +20,17 @@ class GpsData {
 
   Future<void> init() async
   {
-    if(!await _location.serviceEnabled()) {
+    bool enabled = false;
+    for(int n = 0; n < 100; n++) {
+      try {
+        enabled = await _location.serviceEnabled();
+        break;
+      } on PlatformException {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+
+    if(!enabled) {
       if (!await _location.requestService()) {
           return;
         }
@@ -62,13 +73,10 @@ class GpsData {
     // the ability to translate to another language..
 
     // Bearing
-    // This is v2 with more complex maths, because the straight distance calc
-    // was frequently a couple of degrees out, and that's no good for a GPS.
-    //
     // At low speeds <1m/s this is probably wrong due to jitter in the GPS signal.
     // Possibly calculate second only if speed is faster
-    final ns = sin(lon2 - lon1) * cos(lat2);
-    final ew = cos(lat1) * sin(lat2) -  sin(lat1) * cos(lat2) * cos(lon1 - lon2);
+    final ns = lon2 - lon1 * cos(lat2);
+    final ew = lat2 - lat1;
     calculatedBearing = _radToDeg(atan2(ns, ew));
 
     // Straight line distance

@@ -43,16 +43,14 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void start()
-  {
+  void start() {
     Wakelock.enable();
     _timer = Timer.periodic(const Duration(milliseconds: 250), (t) {
       setState(() {});
     });
   }
 
-  void stop()
-  {
+  void stop() {
     _timer?.cancel();
     Wakelock.disable();
   }
@@ -78,41 +76,55 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Container(
         padding: const EdgeInsets.all(20),
-        child: SizedBox(
-            width: 270,
-            height: 200,
-            child: Row(children: [
-              Center(
-                  child: Column(children: [
-                const Text('Latitude'),
-                Text(NumberFormat("##0.0##").format(widget.gpsData.latitude),
-                    style: const TextStyle(fontSize: 28)),
+        child: Column(children: [
+          SizedBox(
+              width: 270,
+              height: 200,
+              child: Row(children: [
+                Center(
+                    child: Column(children: [
+                  const Text('Latitude'),
+                  Text(NumberFormat("##0.0##").format(widget.gpsData.latitude),
+                      style: const TextStyle(fontSize: 28)),
+                  const Spacer(),
+                  const Text('Speed (actual)'),
+                  Text(
+                      "${NumberFormat("###0").format(widget.gpsData.speed * _speedConstant)}$_speedSuffix",
+                      style: const TextStyle(fontSize: 28)),
+                  const Spacer(),
+                  const Text('Bearing (actual)'),
+                  Text(
+                      "${NumberFormat("###0").format(widget.gpsData.bearing)}°",
+                      style: const TextStyle(fontSize: 28)),
+                ])),
                 const Spacer(),
-                const Text('Speed (actual)'),
-                Text("${NumberFormat("###0").format(widget.gpsData.speed * _speedConstant)}$_speedSuffix",
-                    style: const TextStyle(fontSize: 28)),
-                const Spacer(),
-                const Text('Bearing (actual)'),
-                Text("${NumberFormat("###0").format(widget.gpsData.bearing)}°",
-                    style: const TextStyle(fontSize: 28)),
+                Center(
+                    child: Column(children: [
+                  const Text('Longitude'),
+                  Text(NumberFormat("##0.0##").format(widget.gpsData.longitude),
+                      style: const TextStyle(fontSize: 28)),
+                  const Spacer(),
+                  const Text('Speed (calculated))'),
+                  Text(
+                      "${NumberFormat("###0").format(widget.gpsData.calculatedSpeed * _speedConstant)}$_speedSuffix",
+                      style: const TextStyle(fontSize: 28)),
+                  const Spacer(),
+                  const Text('Bearing (calculated)'),
+                  Text(
+                      "${NumberFormat("###0").format(widget.gpsData.calculatedBearing)}°",
+                      style: const TextStyle(fontSize: 28))
+                ])),
               ])),
-              const Spacer(),
-              Center(
-                  child: Column(children: [
-                const Text('Longitude'),
-                Text(NumberFormat("##0.0##").format(widget.gpsData.longitude),
-                    style: const TextStyle(fontSize: 28)),
-                const Spacer(),
-                const Text('Speed (calculated))'),
-                Text(
-                    "${NumberFormat("###0").format(widget.gpsData.calculatedSpeed * _speedConstant)}$_speedSuffix",
-                    style: const TextStyle(fontSize: 28)),
-                const Spacer(),
-                const Text('Bearing (calculated)'),
-                Text(
-                    "${NumberFormat("###0").format(widget.gpsData.calculatedBearing)}°",
-                    style: const TextStyle(fontSize: 28))
-              ])),
-            ])));
+          Row(children: [
+            TextButton(
+                onPressed: widget.gpsData.connected()
+                    ? null
+                    : () async {
+                        await widget.gpsData.connect();
+                        setState(() {});
+                      },
+                child: Text(widget.gpsData.connected() ? 'Connected' : 'Connect to TeslaAndroid'))
+          ])
+        ]));
   }
 }

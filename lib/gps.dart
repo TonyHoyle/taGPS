@@ -1,7 +1,7 @@
-
 import 'dart:math';
 
 import 'package:flutter/services.dart';
+import 'package:gps_test/gps_websocket.dart';
 import 'package:location/location.dart';
 
 class GpsData {
@@ -14,14 +14,16 @@ class GpsData {
   double calculatedBearing = 0;
 
   double _updateTime = 0;
-
+  final GpsWebsocket _websocket = GpsWebsocket();
 
   final Location _location = Location();
 
-  Future<void> init() async
-  {
+  Future<bool> connect() async => _websocket.connect();
+  bool connected() => _websocket.connected();
+
+  Future<void> init() async {
     bool enabled = false;
-    for(int n = 0; n < 100; n++) {
+    for (int n = 0; n < 100; n++) {
       try {
         enabled = await _location.serviceEnabled();
         break;
@@ -30,27 +32,32 @@ class GpsData {
       }
     }
 
-    if(!enabled) {
+    if (!enabled) {
       if (!await _location.requestService()) {
-          return;
-        }
+        return;
+      }
     }
 
     var status = await _location.hasPermission();
-    if(status == PermissionStatus.denied) {
+    if (status == PermissionStatus.denied) {
       status = await _location.requestPermission();
     }
-    if(status != PermissionStatus.granted) {
+    if (status != PermissionStatus.granted) {
       return;
     }
+
+    await _websocket.connect();
 
     _location.onLocationChanged.listen((currentLocation) {
       _updateLocation(currentLocation);
     });
   }
 
-  void _updateLocation(LocationData currentLocation)
-  {
+  void _updateLocation(LocationData currentLocation) {
+    if (_websocket.connected()) {
+      _websocket.send(currentLocation);
+    }
+
     final lastLatitude = latitude;
     final lastLongitude = longitude;
     final lastUpdateTime = _updateTime;
@@ -85,27 +92,26 @@ class GpsData {
     const earthRadius = 6378137.0;
     final dLat = sin(lat2 - lat1) / 2;
     final dLon = sin(lon2 - lon1) / 2;
-    final flatDistance = 2000 * earthRadius * asin(sqrt((dLat*dLat) + cos(lat1) * cos(lat2) * (dLon*dLon)));
+    final flatDistance = 2000 *
+        earthRadius *
+        asin(sqrt((dLat * dLat) + cos(lat1) * cos(lat2) * (dLon * dLon)));
 
     // Take into account rise, if available.. this matters on steep hills
     final rise = altitude - lastAltitude;
     var distance = flatDistance;
-    if(rise.abs() > 0) {
+    if (rise.abs() > 0) {
       distance = sqrt((flatDistance * flatDistance) + (rise * rise));
     }
 
     calculatedSpeed = distance / (_updateTime - lastUpdateTime);
   }
 
-  double _radToDeg(double radians)
-  {
+  double _radToDeg(double radians) {
     var deg = radians * 180 / pi;
-    return (deg >= 0) ? deg : 360+deg;
+    return (deg >= 0) ? deg : 360 + deg;
   }
 
-  double _degToRad(double degrees)
-  {
+  double _degToRad(double degrees) {
     return degrees * pi / 180;
   }
-
 }

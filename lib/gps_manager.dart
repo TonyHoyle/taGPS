@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/services.dart';
-import 'package:gps_test/gps_websocket.dart';
+import 'gps_websocket.dart';
 import 'package:location/location.dart';
 
 class GpsManager {

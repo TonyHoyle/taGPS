@@ -32,8 +32,7 @@ class GpsData {
     return GpsData(
       latitude: locationData.latitude.toString(),
       longitude: locationData.longitude.toString(),
-      accuracy: locationData.accuracy
-          .toString(), // Old code had vertical accuracy here but I'm not sure that makes sense given we're not sending altitude
+      accuracy: locationData.accuracy.toString(), // Old code had vertical accuracy here but I'm not sure that makes sense given we're not sending altitude
       timestamp: locationData.time.toString(),
       speed: locationData.speed.toString(),
       bearing: locationData.heading.toString(),

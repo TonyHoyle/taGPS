@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'gps.dart';
+import 'gps_manager.dart';
 
 class GpsView extends StatefulWidget {
   GpsView({super.key});
 
-  final GpsData gpsData = GpsData();
+  final GpsManager gpsData = GpsManager();
 
   @override
   State<GpsView> createState() => _GpsViewState();
@@ -45,13 +45,10 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
 
   void start() {
     Wakelock.enable();
-    _timer = Timer.periodic(const Duration(milliseconds: 250), (t) {
-      setState(() {});
-    });
+    widget.gpsData.onGpsChange = () => setState(() { });
   }
 
   void stop() {
-    _timer?.cancel();
     Wakelock.disable();
   }
 
@@ -79,7 +76,7 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
         child: Column(children: [
           SizedBox(
               width: 270,
-              height: 200,
+              height: 300,
               child: Row(children: [
                 Center(
                     child: Column(children: [
@@ -96,6 +93,11 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
                   Text(
                       "${NumberFormat("###0").format(widget.gpsData.bearing)}°",
                       style: const TextStyle(fontSize: 28)),
+                  const Spacer(),
+                  const Text('Update time'),
+                  Text(
+                      DateFormat.Hms().format(DateTime.fromMillisecondsSinceEpoch(widget.gpsData.updateTime.toInt())),
+                      style: const TextStyle(fontSize: 28))
                 ])),
                 const Spacer(),
                 Center(
@@ -112,7 +114,8 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
                   const Text('Bearing (calculated)'),
                   Text(
                       "${NumberFormat("###0").format(widget.gpsData.calculatedBearing)}°",
-                      style: const TextStyle(fontSize: 28))
+                      style: const TextStyle(fontSize: 28)),
+                  const SizedBox(height: 80),
                 ])),
               ])),
           Row(children: [

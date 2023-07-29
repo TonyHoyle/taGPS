@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:gps_test/gps_websocket.dart';
 import 'package:location/location.dart';
 
-class GpsData {
+class GpsManager {
   double latitude = 0;
   double longitude = 0;
   double speed = 0;
@@ -12,8 +12,10 @@ class GpsData {
   double altitude = 0;
   double calculatedSpeed = 0;
   double calculatedBearing = 0;
+  int updateTime = 0;
 
-  double _updateTime = 0;
+  Function? onGpsChange;
+
   final GpsWebsocket _websocket = GpsWebsocket();
 
   final Location _location = Location();
@@ -46,6 +48,9 @@ class GpsData {
       return;
     }
 
+    _location.changeSettings(accuracy: LocationAccuracy.high, interval: 1000, distanceFilter: 0);
+
+
     await _websocket.connect();
 
     _location.onLocationChanged.listen((currentLocation) {
@@ -54,13 +59,14 @@ class GpsData {
   }
 
   void _updateLocation(LocationData currentLocation) {
+
     if (_websocket.connected()) {
       _websocket.send(currentLocation);
     }
 
     var lastLatitude = latitude;
     var lastLongitude = longitude;
-    final lastUpdateTime = _updateTime;
+    final lastUpdateTime = updateTime;
     final lastAltitude = altitude;
 
     latitude = currentLocation.latitude ?? 0;
@@ -68,7 +74,7 @@ class GpsData {
     speed = currentLocation.speed ?? 0;
     bearing = currentLocation.heading ?? 0;
     altitude = currentLocation.altitude ?? 0;
-    _updateTime = currentLocation.time ?? 0;
+    updateTime = currentLocation.time?.toInt() ?? 0;
 
     // Lat and Lon are in degrees, so first go to radians
     final lon1 = _degToRad(longitude);
@@ -105,7 +111,9 @@ class GpsData {
       distance = sqrt((flatDistance * flatDistance) + (rise * rise));
     }
 
-    calculatedSpeed = distance / (_updateTime - lastUpdateTime);
+    calculatedSpeed = distance / (updateTime - lastUpdateTime);
+
+    onGpsChange?.call();
   }
 
   double _radToDeg(double radians) {

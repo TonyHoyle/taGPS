@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'gpsview.dart';
+import 'gps_view.dart';
 
 void main() {
   runApp(const MyApp());

@@ -58,6 +58,16 @@ class GpsManager {
     });
   }
 
+  void stop()
+  {
+    _websocket.close();
+  }
+
+  void start()
+  {
+    _websocket.connect();
+  }
+
   void _updateLocation(LocationData currentLocation) {
 
     if (_websocket.connected()) {

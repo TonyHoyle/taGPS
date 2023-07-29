@@ -9,7 +9,7 @@ import 'gps_manager.dart';
 class GpsView extends StatefulWidget {
   GpsView({super.key});
 
-  final GpsManager gpsData = GpsManager();
+  final GpsManager gpsManager = GpsManager();
 
   @override
   State<GpsView> createState() => _GpsViewState();
@@ -20,7 +20,6 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
   static const Mph = 2.23694;
 //  static const Kph = 3.6;
 
-  Timer? _timer;
   final _speedConstant = Mph;
   final _speedSuffix = 'mph';
 
@@ -30,7 +29,7 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
     Future.delayed(Duration.zero, () async {
-      await widget.gpsData.init();
+      await widget.gpsManager.init();
       start();
     });
   }
@@ -45,11 +44,13 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
 
   void start() {
     Wakelock.enable();
-    widget.gpsData.onGpsChange = () => setState(() { });
+    widget.gpsManager.onGpsChange = () => setState(() { });
+    widget.gpsManager.start();
   }
 
   void stop() {
     Wakelock.disable();
+    widget.gpsManager.stop();
   }
 
   @override
@@ -81,52 +82,52 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
                 Center(
                     child: Column(children: [
                   const Text('Latitude'),
-                  Text(NumberFormat("##0.0##").format(widget.gpsData.latitude),
+                  Text(NumberFormat("##0.0##").format(widget.gpsManager.latitude),
                       style: const TextStyle(fontSize: 28)),
                   const Spacer(),
                   const Text('Speed (actual)'),
                   Text(
-                      "${NumberFormat("###0").format(widget.gpsData.speed * _speedConstant)}$_speedSuffix",
+                      "${NumberFormat("###0").format(widget.gpsManager.speed * _speedConstant)}$_speedSuffix",
                       style: const TextStyle(fontSize: 28)),
                   const Spacer(),
                   const Text('Bearing (actual)'),
                   Text(
-                      "${NumberFormat("###0").format(widget.gpsData.bearing)}°",
+                      "${NumberFormat("###0").format(widget.gpsManager.bearing)}°",
                       style: const TextStyle(fontSize: 28)),
                   const Spacer(),
                   const Text('Update time'),
                   Text(
-                      DateFormat.Hms().format(DateTime.fromMillisecondsSinceEpoch(widget.gpsData.updateTime.toInt())),
+                      DateFormat.Hms().format(DateTime.fromMillisecondsSinceEpoch(widget.gpsManager.updateTime.toInt())),
                       style: const TextStyle(fontSize: 28))
                 ])),
                 const Spacer(),
                 Center(
                     child: Column(children: [
                   const Text('Longitude'),
-                  Text(NumberFormat("##0.0##").format(widget.gpsData.longitude),
+                  Text(NumberFormat("##0.0##").format(widget.gpsManager.longitude),
                       style: const TextStyle(fontSize: 28)),
                   const Spacer(),
                   const Text('Speed (calculated))'),
                   Text(
-                      "${NumberFormat("###0").format(widget.gpsData.calculatedSpeed * _speedConstant)}$_speedSuffix",
+                      "${NumberFormat("###0").format(widget.gpsManager.calculatedSpeed * _speedConstant)}$_speedSuffix",
                       style: const TextStyle(fontSize: 28)),
                   const Spacer(),
                   const Text('Bearing (calculated)'),
                   Text(
-                      "${NumberFormat("###0").format(widget.gpsData.calculatedBearing)}°",
+                      "${NumberFormat("###0").format(widget.gpsManager.calculatedBearing)}°",
                       style: const TextStyle(fontSize: 28)),
                   const SizedBox(height: 80),
                 ])),
               ])),
           Row(children: [
             TextButton(
-                onPressed: widget.gpsData.connected()
+                onPressed: widget.gpsManager.connected()
                     ? null
                     : () async {
-                        await widget.gpsData.connect();
+                        await widget.gpsManager.connect();
                         setState(() {});
                       },
-                child: Text(widget.gpsData.connected() ? 'Connected' : 'Connect to TeslaAndroid'))
+                child: Text(widget.gpsManager.connected() ? 'Connected' : 'Connect to TeslaAndroid'))
           ])
         ]));
   }

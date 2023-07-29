@@ -58,8 +58,8 @@ class GpsData {
       _websocket.send(currentLocation);
     }
 
-    final lastLatitude = latitude;
-    final lastLongitude = longitude;
+    var lastLatitude = latitude;
+    var lastLongitude = longitude;
     final lastUpdateTime = _updateTime;
     final lastAltitude = altitude;
 
@@ -82,9 +82,11 @@ class GpsData {
     // Bearing
     // At low speeds <1m/s this is probably wrong due to jitter in the GPS signal.
     // Possibly calculate second only if speed is faster
-    final ns = lon2 - lon1 * cos(lat2);
-    final ew = lat2 - lat1;
-    calculatedBearing = _radToDeg(atan2(ns, ew));
+    final diffLon = _degToRad((longitude - lastLongitude));
+    final x = cos(lat1) * sin(diffLon);
+    final y = cos(lat2) * sin(lat1) - sin(lat2) * cos(lat1) * cos(diffLon);
+    final r = atan2(x,y);
+    calculatedBearing = _radToDeg(r);
 
     // Straight line distance
     // There are about a dozen variants of this, all produce slightly

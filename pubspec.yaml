@@ -34,7 +34,6 @@ dependencies:
   intl: ^0.18.1
   location: ^5.0.0
   wakelock: ^0.6.2
-  web_socket_channel: ^2.4.0
   json_annotation: ^4.8.1
 
 dependency_overrides:

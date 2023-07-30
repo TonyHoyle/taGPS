@@ -13,6 +13,7 @@ class Updater {
 
   final PersistentWebsocket _websocket = PersistentWebsocket();
   final Location _location = Location();
+  bool _backgroundEnabled = false;
 
   Function? onUpdate;
 
@@ -47,57 +48,56 @@ class Updater {
         onTapBringToFront: false // True is broken
         );
 
-    await _websocket.connect(taGpsSocket);
+    await _websocket.connect(taGpsSocket, onConnect: () => onUpdate?.call(), onDisconnect: () => onUpdate?.call());
 
     _location.onLocationChanged.listen((currentLocation) {
       _updateLocation(currentLocation);
     });
 
-    if(runInBackground) {
-      _backgroundMode(true);
+    _backgroundEnabled = runInBackground;
+    _backgroundMode(runInBackground);
+  }
+
+  void pause() {
+    if (!_backgroundEnabled) {
+      _websocket.close();
     }
   }
 
-  void pause()
-  {
-    _websocket.close();
-  }
-
-  void resume()
-  {
+  void resume() {
     _websocket.reconnect();
   }
 
   void enableBackgroundMode(BuildContext context, bool enable) {
-    if(!enable) {
+    _backgroundEnabled = enable;
+    if (!enable) {
       _backgroundMode(false);
     } else {
-      Permission.locationAlways.isGranted.then((enabled) =>
-      {
-        if (enabled)
-          {_backgroundMode(true)}
-        else
-          {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                      title: const Text('Permissions needed'),
-                      content: const Text(
-                          'To continue to send GPS updates when the app is in the background, please set gps permissions to \'Always\''),
-                      actions: [
-                        TextButton(
-                            child: const Text('ok'),
-                            onPressed: () async {
-                              await _backgroundMode(true);
-                              if (context.mounted) {
-                                Navigator.pop(context);
-                              }
-                            })
-                      ]);
-                })
-          }
-      });
+      Permission.locationAlways.isGranted.then((enabled) => {
+            if (enabled)
+              {_backgroundMode(true)}
+            else
+              {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                          title: const Text('Permissions needed'),
+                          content: const Text(
+                              'To continue to send GPS updates when the app is in the background, please set gps permissions to \'Always\''),
+                          actions: [
+                            TextButton(
+                                child: const Text('ok'),
+                                onPressed: () async {
+                                  await _backgroundMode(true);
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                })
+                          ]);
+                    })
+              }
+          });
     }
   }
 
@@ -113,7 +113,7 @@ class Updater {
   void enable(bool enable) {
     if (enable) {
       _websocket.reconnect();
-      _backgroundMode(true);
+      _backgroundMode(_backgroundEnabled);
     } else {
       _websocket.close();
       _backgroundMode(false);

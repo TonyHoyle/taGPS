@@ -28,6 +28,7 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
       _background = _prefs.getBool("Background") ?? false;
       await widget.updater.init(_background);
       widget.updater.onUpdate = () => setState(() {});
+      setState((){});
     });
   }
 
@@ -43,14 +44,10 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
     switch(state)
     {
       case AppLifecycleState.paused:
-        if(!_background) {
-          widget.updater.pause();
-        }
+        widget.updater.pause();
         break;
       case AppLifecycleState.resumed:
-        if(!_background) {
-          widget.updater.resume();
-        }
+        widget.updater.resume();
         break;
       default:
         break;

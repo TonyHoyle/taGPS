@@ -5,13 +5,21 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 class PersistentWebsocket {
+  final HttpClient _httpClient = HttpClient();
+
   WebSocket? _socket;
-  late Uri _uri;
+  Uri? _uri;
   bool _retry = true;
   bool _running = false;
 
-  Future<bool> connect(String socketUrl, {bool retry = true}) async {
+  Function? _onConnect;
+  Function? _onDisonnect;
+
+  Future<bool> connect(String socketUrl, {bool retry = true, Function? onConnect, Function? onDisconnect}) async {
     _retry = retry;
+    _onConnect = onConnect;
+    _onDisonnect = onDisconnect;
+
     final socketUri = Uri.parse(socketUrl);
     _uri = Uri(
         scheme: socketUri.scheme == 'wss' ? 'https' : 'http',
@@ -26,12 +34,17 @@ class PersistentWebsocket {
   }
 
   Future<bool> reconnect() async {
+    _socket = null;
+
+    if(_uri == null) {
+      return false;
+    }
+
     try {
-      _socket = null;
       _running = true;
       final key = base64.encode(List<int>.generate(16, (_) => Random().nextInt(256)));
-      final client = HttpClient();
-      final request = await client.getUrl(_uri);
+      debugPrint(_uri.toString());
+      final request = await _httpClient.getUrl(_uri!);
 
       // Dart is wierd and lowercases everything by default, which is why we can't
       // use the standard websocket
@@ -58,10 +71,15 @@ class PersistentWebsocket {
 
       _socket?.listen((data) { },
           onDone: () {
+            debugPrint("Disconnect");
         if (_running) {
+          _onDisonnect?.call();
           reconnect();
+          return;
         }
       });
+      debugPrint("Connect");
+      _onConnect?.call();
       return true;
     } catch (e) {
       debugPrint("connection failed: ${e.toString()}");
@@ -69,6 +87,7 @@ class PersistentWebsocket {
         Future.delayed(const Duration(seconds: 5), () {
           if (_running) {
             reconnect();
+            return;
           }
         });
       }
@@ -89,7 +108,7 @@ class PersistentWebsocket {
   void send(String message) {
     try {
       debugPrint("Sending $message");
-      _socket?.add(json);
+      _socket?.add(message);
     } catch (e) {
       debugPrint("Send error: ${e.toString()}");
       _socket = null;

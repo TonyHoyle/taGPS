@@ -43,7 +43,6 @@ class PersistentWebsocket {
     try {
       _running = true;
       final key = base64.encode(List<int>.generate(16, (_) => Random().nextInt(256)));
-      debugPrint(_uri.toString());
       final request = await _httpClient.getUrl(_uri!);
 
       // Dart is wierd and lowercases everything by default, which is why we can't

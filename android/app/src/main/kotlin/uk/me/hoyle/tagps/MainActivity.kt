@@ -1,4 +1,4 @@
-package uk.me.hoyle.gpstest.gps_test
+package uk.me.hoyle.tagps
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -8,6 +8,10 @@
     <array>
         <string>location</string>
     </array>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>When enabled, the app will keep sending data to TeslaAndroid in the background</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

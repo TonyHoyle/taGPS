@@ -5,7 +5,9 @@
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to the location to send it to TeslaAndroid</string>
     <key>UIBackgroundModes</key>
-    <string>location</key>
+    <array>
+        <string>location</string>
+    </array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

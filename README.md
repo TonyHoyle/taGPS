@@ -1,5 +1,5 @@
 # taGPS
-GPS Relay for Tesla Android
+GPS Relay for Tesla Android (https://www.teslaandroid.com)
 
 Early version, expect bugs.
 

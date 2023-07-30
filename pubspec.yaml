@@ -1,4 +1,4 @@
-name: taGps
+name: tagps
 description: Tesla Android GPS Generator
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.0.1+2
+version: 0.0.2+1
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -31,10 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  intl: ^0.18.1
-  location: ^5.0.0
-  wakelock: ^0.6.2
+  location: ^5.0.1
   json_annotation: ^4.8.1
+  permission_handler: ^10.4.3
+  shared_preferences: ^2.2.0
 
 dependency_overrides:
   location_platform_interface: 3.0.0

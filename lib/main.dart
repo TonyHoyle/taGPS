@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'gps_view.dart';
+import 'view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,12 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'TeslaAndroid GPS Relay',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'GPS Test'),
+      home: const MyHomePage(title: 'TeslaAndroid GPS Relay'),
     );
   }
 }
@@ -39,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
         ),
-        body: GpsView());
+        body: GpsView()
+    );
   }
 }

@@ -126,7 +126,11 @@ class PersistentWebsocket {
   }
 
   bool connected() {
-    return _socket != null;
+    if(_socket != null) {
+      _checkpoint = DateTime.now().millisecondsSinceEpoch;
+      return true;
+    }
+    return false;
   }
 
   void close() {
@@ -136,6 +140,9 @@ class PersistentWebsocket {
   }
 
   void send(String message) {
+    if(!connected()) {
+        return;
+    }
     try {
       debugPrint("Sending $message");
       _socket?.add(message);

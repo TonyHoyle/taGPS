@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'view.dart';
@@ -11,13 +13,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final platform = (Platform.isIOS) ? 'TA' : 'TeslaAndroid';
     return MaterialApp(
-      title: 'TeslaAndroid GPS Relay',
+      title: '$platform GPS Relay',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'TeslaAndroid GPS Relay'),
+      home: MyHomePage(title: '$platform GPS Relay'),
     );
   }
 }

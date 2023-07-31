@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,9 +42,10 @@ class Updater {
     _location.changeSettings(
         accuracy: LocationAccuracy.high, interval: 1000, distanceFilter: 0);
 
+    final platform = (Platform.isIOS) ? 'TA Pi' : 'TeslaAndroid';
     await _location.changeNotificationOptions(
         iconName: "ic_launcher",
-        title: "TeslaAndroid GPS Relay",
+        title: "$platform GPS Relay",
         subtitle: "GPS Relay is active",
         onTapBringToFront: false // True is broken
         );

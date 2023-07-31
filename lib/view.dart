@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,16 +57,17 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final platform = (Platform.isIOS) ? 'TA Pi' : 'TeslaAndroid';
     return Container(
         padding: const EdgeInsets.all(20),
         child: Column(children: [
-          const Text('Connect to the TeslaAndroid hotspot',
+          Text('Connect phone to the $platform hotspot',
               textAlign: TextAlign.center),
           const Text('Ensure browser GPS is disabled',
               textAlign: TextAlign.center),
           const Spacer(),
           Text(widget.updater.connected()
-              ? 'Connected to TeslaAndroid'
+              ? 'Connected to $platform'
               : 'Trying to connect'),
           const Spacer(),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [

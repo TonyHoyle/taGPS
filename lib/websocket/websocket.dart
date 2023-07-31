@@ -11,14 +11,24 @@ class PersistentWebsocket {
   Uri? _uri;
   bool _retry = true;
   bool _running = false;
+  int _checkpoint = 0;
+  int _timeout = 0;
+
+  // ignore: constant_identifier_names
+  static const int TIMEOUT = 1000 * 60 * 2;
 
   Function? _onConnect;
   Function? _onDisonnect;
+  Function? _onTimeout;
 
-  Future<bool> connect(String socketUrl, {bool retry = true, Function? onConnect, Function? onDisconnect}) async {
+  Future<bool> connect(String socketUrl, {bool retry = true, Function? onConnect, Function? onDisconnect, Function? onTimeout, int timeout = TIMEOUT}) async {
     _retry = retry;
     _onConnect = onConnect;
     _onDisonnect = onDisconnect;
+    _onTimeout = onTimeout;
+    _timeout = timeout;
+
+    _checkpoint = DateTime.now().millisecondsSinceEpoch;
 
     final socketUri = Uri.parse(socketUrl);
     _uri = Uri(
@@ -58,6 +68,12 @@ class PersistentWebsocket {
         if (_retry && _running) {
           Future.delayed(const Duration(seconds: 5), () {
             if (_running) {
+              int now = DateTime.now().millisecondsSinceEpoch;
+              if(now > _checkpoint + _timeout) {
+                debugPrint("Timeout");
+                _onTimeout?.call();
+                return;
+              }
               reconnect();
             }
           });
@@ -72,12 +88,19 @@ class PersistentWebsocket {
           onDone: () {
             debugPrint("Disconnect");
         if (_running) {
+          int now = DateTime.now().millisecondsSinceEpoch;
+          if(now > _checkpoint + _timeout) {
+            debugPrint("Timeout");
+            _onTimeout?.call();
+            return;
+          }
           _onDisonnect?.call();
           reconnect();
           return;
         }
       });
       debugPrint("Connect");
+      _checkpoint = DateTime.now().millisecondsSinceEpoch;
       _onConnect?.call();
       return true;
     } catch (e) {
@@ -85,6 +108,12 @@ class PersistentWebsocket {
       if (_retry && _running) {
         Future.delayed(const Duration(seconds: 5), () {
           if (_running) {
+            int now = DateTime.now().millisecondsSinceEpoch;
+            if(now > _checkpoint + _timeout) {
+              debugPrint("Timeout");
+              _onTimeout?.call();
+              return;
+            }
             reconnect();
             return;
           }

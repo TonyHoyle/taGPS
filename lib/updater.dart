@@ -70,6 +70,7 @@ class Updater {
 
   void resume() {
     _websocket.reconnect();
+    _backgroundMode(_backgroundEnabled);
     _paused = false;
   }
 

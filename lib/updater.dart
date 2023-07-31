@@ -15,6 +15,7 @@ class Updater {
   final PersistentWebsocket _websocket = PersistentWebsocket();
   final Location _location = Location();
   bool _backgroundEnabled = false;
+  bool _paused = false;
 
   Function? onUpdate;
 
@@ -50,7 +51,7 @@ class Updater {
         onTapBringToFront: false // True is broken
         );
 
-    await _websocket.connect(taGpsSocket, onConnect: () => onUpdate?.call(), onDisconnect: () => onUpdate?.call());
+    await _websocket.connect(taGpsSocket, onConnect: () => onUpdate?.call(), onDisconnect: () => onUpdate?.call(), onTimeout: () => die());
 
     _location.onLocationChanged.listen((currentLocation) {
       _updateLocation(currentLocation);
@@ -64,10 +65,22 @@ class Updater {
     if (!_backgroundEnabled) {
       _websocket.close();
     }
+    _paused = true;
   }
 
   void resume() {
     _websocket.reconnect();
+    _paused = false;
+  }
+
+  void die() {
+    if(_paused) {
+      _websocket.close();
+      _backgroundMode(false);
+      onUpdate?.call();
+    } else {
+      _websocket.reconnect(reset: true);
+    }
   }
 
   void enableBackgroundMode(BuildContext context, bool enable) {
@@ -92,6 +105,7 @@ class Updater {
                                 child: const Text('ok'),
                                 onPressed: () async {
                                   await _backgroundMode(true);
+                                  _backgroundEnabled = await _location.isBackgroundModeEnabled();
                                   if (context.mounted) {
                                     Navigator.pop(context);
                                   }
@@ -124,6 +138,10 @@ class Updater {
 
   bool connected() {
     return _websocket.connected();
+  }
+
+  bool backgroundEnabled() {
+    return _backgroundEnabled;
   }
 
   void _updateLocation(LocationData currentLocation) {

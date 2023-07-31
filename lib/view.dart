@@ -16,7 +16,6 @@ class GpsView extends StatefulWidget {
 
 class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
   bool _enabled = true;
-  bool _background = false;
   late SharedPreferences _prefs;
 
   @override
@@ -26,8 +25,7 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
 
     Future.delayed(Duration.zero, () async {
       _prefs = await SharedPreferences.getInstance();
-      _background = _prefs.getBool("Background") ?? false;
-      await widget.updater.init(_background);
+      await widget.updater.init(_prefs.getBool("Background") ?? false);
       widget.updater.onUpdate = () => setState(() {});
       setState((){});
     });
@@ -83,11 +81,10 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Text('Run in Background'),
             Switch(
-                value: _background,
+                value: widget.updater.backgroundEnabled(),
                 onChanged: (value) {
-                  _background = value;
                   widget.updater.enableBackgroundMode(context, value);
-                  _prefs.setBool("Background", _background);
+                  _prefs.setBool("Background", widget.updater.backgroundEnabled());
                   setState(() {});
                 })
           ]),

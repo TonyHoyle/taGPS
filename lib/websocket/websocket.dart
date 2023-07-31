@@ -28,8 +28,6 @@ class PersistentWebsocket {
     _onTimeout = onTimeout;
     _timeout = timeout;
 
-    _checkpoint = DateTime.now().millisecondsSinceEpoch;
-
     final socketUri = Uri.parse(socketUrl);
     _uri = Uri(
         scheme: socketUri.scheme == 'wss' ? 'https' : 'http',
@@ -40,11 +38,15 @@ class PersistentWebsocket {
         queryParameters: socketUri.queryParameters,
         fragment: socketUri.fragment
     );
-    return reconnect();
+    return reconnect(reset: true);
   }
 
-  Future<bool> reconnect() async {
+  Future<bool> reconnect({bool reset = false}) async {
     _socket = null;
+
+    if(reset) {
+      _checkpoint = DateTime.now().millisecondsSinceEpoch;
+    }
 
     if(_uri == null) {
       return false;

@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to the location to send it to TeslaAndroid</string>
+    <string>This app needs access to the location to send it to TA running on the Pi</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>location</string>
     </array>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>When enabled, the app will keep sending data to TeslaAndroid in the background</string>
+    <string>When enabled, the app will keep sending data to TA running on the Pi in the background</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
 	<key>CFBundleDevelopmentRegion</key>

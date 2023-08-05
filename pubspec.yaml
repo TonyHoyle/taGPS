@@ -35,6 +35,7 @@ dependencies:
   json_annotation: ^4.8.1
   permission_handler: ^10.4.3
   shared_preferences: ^2.2.0
+  intl: ^0.18.1
 
 dependency_overrides:
   location_platform_interface: 3.0.0

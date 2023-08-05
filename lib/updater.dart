@@ -17,7 +17,12 @@ class Updater {
   bool _backgroundEnabled = false;
   bool _paused = false;
 
+  Updater._();
+
   Function? onUpdate;
+  Function(LocationData location)? onLocation;
+
+  static final Updater instance = Updater._();
 
   Future<void> init(bool runInBackground) async {
     bool enabled = false;
@@ -152,6 +157,7 @@ class Updater {
       _websocket.send(json);
     }
 
+    onLocation?.call(currentLocation);
     onUpdate?.call();
   }
 }

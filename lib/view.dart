@@ -8,7 +8,7 @@ import 'updater.dart';
 class GpsView extends StatefulWidget {
   GpsView({super.key});
 
-  final Updater updater = Updater();
+  final Updater updater = Updater.instance;
 
   @override
   State<GpsView> createState() => _GpsViewState();

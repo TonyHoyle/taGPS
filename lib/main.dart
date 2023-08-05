@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'gpstest.dart';
 import 'view.dart';
 
 void main() {
@@ -39,10 +40,28 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
-        ),
-        body: GpsView()
-    );
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: Text(widget.title),
+            actions: [
+              PopupMenuButton(
+                  // add icon, by default "3 dot" icon
+                  // icon: Icon(Icons.book)
+                  itemBuilder: (context) {
+                return [
+                  const PopupMenuItem<int>(
+                    value: 0,
+                    child: Text("GPS Test")
+                  ),
+                ];
+              }, onSelected: (value) {
+                if (value == 0) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => GpsTest(),
+                    ),
+                  );                }
+              })
+            ]),
+        body: GpsView());
   }
 }

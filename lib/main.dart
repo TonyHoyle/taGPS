@@ -44,22 +44,24 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text(widget.title),
             actions: [
               PopupMenuButton(
-                  // add icon, by default "3 dot" icon
-                  // icon: Icon(Icons.book)
                   itemBuilder: (context) {
                 return [
-                  const PopupMenuItem<int>(
-                    value: 0,
-                    child: Text("GPS Test")
-                  ),
+                  const PopupMenuItem<int>(value: 0, child: Text("GPS Test")),
                 ];
               }, onSelected: (value) {
                 if (value == 0) {
-                  Navigator.of(context).push(
+                  Navigator.push(
+                    context,
                     MaterialPageRoute(
-                      builder: (context) => GpsTest(),
+                      builder: (context) => Scaffold(
+                          appBar: AppBar(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              title: Text(widget.title)),
+                          body: GpsTest()),
                     ),
-                  );                }
+                  );
+                }
               })
             ]),
         body: GpsView());

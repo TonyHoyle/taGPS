@@ -42,6 +42,7 @@ class _GpsTestState extends State<GpsTest> with WidgetsBindingObserver {
   {
     _realLocation = location;
     _fakeLocation = widget.estimator.estimate(location);
+    setState((){});
   }
 
   @override
@@ -56,7 +57,7 @@ class _GpsTestState extends State<GpsTest> with WidgetsBindingObserver {
                 Center(
                     child: Column(children: [
                       const Text('Latitude'),
-                      Text(NumberFormat("##0.0##").format(_realLocation?.latitude),
+                      Text(NumberFormat("##0.0##").format(_realLocation?.latitude ?? 0),
                           style: const TextStyle(fontSize: 28)),
                       const Spacer(),
                       const Text('Speed (actual)'),
@@ -66,7 +67,7 @@ class _GpsTestState extends State<GpsTest> with WidgetsBindingObserver {
                       const Spacer(),
                       const Text('Bearing (actual)'),
                       Text(
-                          "${NumberFormat("###0").format(_realLocation?.heading)}°",
+                          "${NumberFormat("###0").format(_realLocation?.heading ?? 0)}°",
                           style: const TextStyle(fontSize: 28)),
                       const Spacer(),
                       const Text('Update time'),
@@ -78,7 +79,7 @@ class _GpsTestState extends State<GpsTest> with WidgetsBindingObserver {
                 Center(
                     child: Column(children: [
                       const Text('Longitude'),
-                      Text(NumberFormat("##0.0##").format(_realLocation?.longitude),
+                      Text(NumberFormat("##0.0##").format(_realLocation?.longitude ?? 0),
                           style: const TextStyle(fontSize: 28)),
                       const Spacer(),
                       const Text('Speed (calculated))'),
@@ -88,7 +89,7 @@ class _GpsTestState extends State<GpsTest> with WidgetsBindingObserver {
                       const Spacer(),
                       const Text('Bearing (calculated)'),
                       Text(
-                          "${NumberFormat("###0").format(_fakeLocation?.heading)}°",
+                          "${NumberFormat("###0").format(_fakeLocation?.heading ?? 0)}°",
                           style: const TextStyle(fontSize: 28)),
                       const SizedBox(height: 80),
                     ])),

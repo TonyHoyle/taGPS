@@ -1,12 +1,13 @@
 # taGPS
 GPS Relay for Tesla Android (https://www.teslaandroid.com)
 
-Early version, expect bugs.
+Version 1.0.  
 
 1. Disable browser GPS on TA
 2. Connecct phone to TA hotspot
 3. Launch app
+4. Enable background mode (recommended).
 
-To have the app remain active in the background select the background option.  It will try to connect as you go in and out
-of range of the car, but not a good idea to leave it in that state as it's still using battery to do that.  
-Still working on ways to get the power usage down.
+Background mode is recommended to save battery, otherwise the display must be kept on.
+After 2 minutes of inactivity in backgrond mode the app will shut down, so it's safe to leave it running after you leave the car.
+

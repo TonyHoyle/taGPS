@@ -50,7 +50,7 @@ class Updater {
     }
 
     _location.changeSettings(
-        accuracy: LocationAccuracy.high, interval: 1000, distanceFilter: 0);
+        accuracy: LocationAccuracy.navigation, interval: 1000, distanceFilter: 0);
 
     final platform = (Platform.isIOS) ? 'TA Pi' : 'TeslaAndroid';
     await _location.changeNotificationOptions(
@@ -115,7 +115,7 @@ class Updater {
                 return AlertDialog(
                     title: const Text('Permissions needed'),
                     content: const Text(
-                        'To continue to send GPS updates when the app is in the background, please set gps permissions to \'Always\''),
+                        'To continue to send GPS updates when the app is in the background, please set gps permissions to \'Allow all the time\''),
                     actions: [
                       TextButton(
                           child: const Text('ok'),

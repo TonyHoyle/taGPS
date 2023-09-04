@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:tagps/gps/estimator.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../websocket/websocket.dart';
 import 'package:location/location.dart';
@@ -15,8 +16,10 @@ class Updater {
 
   final PersistentWebsocket _websocket = PersistentWebsocket();
   final Location _location = Location();
+  final GpsEstimator _estimator = GpsEstimator();
   bool _backgroundEnabled = false;
   bool _paused = false;
+  final _estimate = true;
 
   Updater._();
 
@@ -161,6 +164,10 @@ class Updater {
 
   void _updateLocation(LocationData currentLocation) {
     debugPrint("Got location: ${currentLocation.toString()}");
+    if(_estimate) {
+      currentLocation = _estimator.estimate(currentLocation);
+      debugPrint("Estimate location: ${currentLocation.toString()}");
+    }
     if (_websocket.connected()) {
       String json = jsonEncode(GpsData.fromLocationData(currentLocation));
       _websocket.send(json);

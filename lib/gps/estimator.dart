@@ -6,6 +6,7 @@ class GpsEstimator {
   double _lastLatitude = 0;
   double _lastLongitude = 0;
   double _lastAltitude = 0;
+  double _lastHeading = 0;
   int _lastTime = 0;
 
   LocationData estimate(LocationData source) {
@@ -38,16 +39,19 @@ class GpsEstimator {
     const earthRadius = 6378137.0;
     final dLat = sin(lat2 - lat1) / 2;
     final dLon = sin(lon2 - lon1) / 2;
-    final flatDistance = 2000 *
+    var flatDistance = 2000 *
         earthRadius *
         asin(sqrt((dLat * dLat) + cos(lat1) * cos(lat2) * (dLon * dLon)));
 
     // Take into account rise, if available.. this matters on steep hills
     final rise = altitude - _lastAltitude;
-    var distance = flatDistance;
     if (rise.abs() > 0) {
-      distance = sqrt((flatDistance * flatDistance) + (rise * rise));
+      flatDistance = sqrt((flatDistance * flatDistance) + (rise * rise));
     }
+
+    // Compensate for heading changes
+    final theta = _degToRad(_lastHeading - heading);
+    final distance = flatDistance / cos(theta);
 
     final speed = distance / (updateTime - _lastTime);
 
@@ -55,6 +59,7 @@ class GpsEstimator {
     _lastLongitude = longitude;
     _lastTime = updateTime;
     _lastAltitude = altitude;
+    _lastHeading = heading;
 
     return LocationData.fromMap({
             'latitude': latitude,

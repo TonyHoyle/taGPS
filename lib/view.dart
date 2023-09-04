@@ -82,8 +82,8 @@ class _GpsViewState extends State<GpsView> with WidgetsBindingObserver {
             const Text('Run in Background'),
             Switch(
                 value: widget.updater.backgroundEnabled(),
-                onChanged: (value) {
-                  widget.updater.enableBackgroundMode(context, value);
+                onChanged: (value) async {
+                  await widget.updater.enableBackgroundMode(context, value);
                   _prefs.setBool("Background", widget.updater.backgroundEnabled());
                   setState(() {});
                 })

@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final platform = (Platform.isIOS) ? 'TA' : 'TeslaAndroid';
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: '$platform GPS Relay',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),

@@ -44,10 +44,10 @@ class GpsEstimator {
         asin(sqrt((dLat * dLat) + cos(lat1) * cos(lat2) * (dLon * dLon)));
 
     // Take into account rise, if available.. this matters on steep hills
-    final rise = altitude - _lastAltitude;
-    if (rise.abs() > 0) {
-      flatDistance = sqrt((flatDistance * flatDistance) + (rise * rise));
-    }
+//    final rise = altitude - _lastAltitude;
+//    if (rise.abs() > 0) {
+//      flatDistance = sqrt((flatDistance * flatDistance) + (rise * rise));
+//    }
 
     // Compensate for heading changes
     final theta = _degToRad(_lastHeading - heading);

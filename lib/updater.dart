@@ -184,10 +184,10 @@ class Updater {
   }
 
   void _updateLocation(LocationData currentLocation) {
-    debugPrint("Got location: ${currentLocation.toString()}");
-    if(_estimate) {
+    debugPrint("Got location: ${jsonEncode(GpsData.fromLocationData(currentLocation))}");
+    if(_estimate || (currentLocation?.speed ?? -1) < 0) {
       currentLocation = _estimator.estimate(currentLocation);
-      debugPrint("Estimate location: ${currentLocation.toString()}");
+      debugPrint("Estimate location: ${jsonEncode(GpsData.fromLocationData(currentLocation))}");
     }
     if (_websocket.connected()) {
       String json = jsonEncode(GpsData.fromLocationData(currentLocation));

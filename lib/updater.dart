@@ -19,7 +19,7 @@ class Updater {
   final GpsEstimator _estimator = GpsEstimator();
   bool _backgroundEnabled = false;
   bool _paused = false;
-  final _estimate = true;
+  final _estimate = false;
 
   Updater._();
 
@@ -49,10 +49,10 @@ class Updater {
       }
     }
 
-    _location.changeSettings(
+    await _location.changeSettings(
         accuracy: LocationAccuracy.navigation, interval: 1000, distanceFilter: 0);
 
-    final platform = (Platform.isIOS) ? 'TA Pi' : 'TeslaAndroid';
+    final platform = (Platform.isIOS) ? 'TA Pi device' : 'TeslaAndroid';
     await _location.changeNotificationOptions(
         iconName: "ic_launcher",
         title: "$platform GPS Relay",
@@ -102,7 +102,28 @@ class Updater {
       await _backgroundMode(false);
     } else {
       if (Platform.isIOS) {
-        await _backgroundMode(true);
+        // ignore: use_build_context_synchronously
+        if(!context.mounted) { return; }
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  title: const Text('Background mode'),
+                  content: const Text(
+                      'In background mode the app will continue to relay GPS data in the background.  If it loses connection to TA for more than 2 minutes it will stop.'),
+                  actions: [
+                    TextButton(
+                        child: const Text('ok'),
+                        onPressed: () async {
+                          await _backgroundMode(true);
+                          _backgroundEnabled =
+                          await _location.isBackgroundModeEnabled();
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        })
+                  ]);
+            });
       } else if (Platform.isAndroid) {
         if (await Permission.locationAlways.isGranted) {
           await _backgroundMode(true);
@@ -115,7 +136,7 @@ class Updater {
                 return AlertDialog(
                     title: const Text('Permissions needed'),
                     content: const Text(
-                        'To continue to send GPS updates when the app is in the background, please set gps permissions to \'Allow all the time\''),
+                        'To continue to send GPS updates when the app is in the background, please set gps permissions to \'Allow all the time\'.\n\nThe app will stop attempting to send background updates if it loses connection to TeslaAndroid for more than 2 minutes.'),
                     actions: [
                       TextButton(
                           child: const Text('ok'),
